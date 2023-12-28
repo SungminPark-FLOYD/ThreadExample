@@ -32,7 +32,7 @@ public class ThreadTest07 {
     }
 }
 
-//데이터를 입력하는 쓰레드 클래스
+//데이터를 입력하는 쓰레드 클래스 -> main도 하나의 쓰레드이기때문에 main에서 처리해도 됨
 class UserInput extends Thread {
     //입력 여부를 확이하기 위한 변수 선언 - 쓰레드에서 공통으로 사용할 변수
     public static boolean inputChk = false;
@@ -42,14 +42,21 @@ class UserInput extends Thread {
         while(!inputChk) {
             //사용자로부터 데이터 입력받기
             str = JOptionPane.showInputDialog("가위 바위 보 게임");
-            if(str.isEmpty()) {
-                System.out.println("잘못된 입력입니다.");
+            if(str != null) {
+                if(str.isEmpty()) {
+                    System.out.println("잘못된 입력입니다.");
+                }
+
+                else if(str.equals("가위") ||  str.equals("바위") || str.equals("보")) {
+                    inputChk = true;
+                }
+                else System.out.println("잘못된 입력입니다.");
             }
-            else if(str.equals("가위") ||  str.equals("바위") || str.equals("보")) {
-                inputChk = true;
-                break;
+            else {
+                System.out.println("시스템 종료...");
+                //강제종료
+                System.exit(0);
             }
-            else System.out.println("잘못된 입력입니다.");
         }
 
     }
@@ -60,16 +67,18 @@ class Computer extends Thread {
     @Override
     public void run() {
         Random ran = new Random();
+        //int index = (int)(Math.random()*3 + 1) //1부터3까지 난수 생성
         int r = ran.nextInt(3) + 1;
         String result;
+
         if(r == 1) result = "가위";
         else if(r == 2) result = "바위";
         else result = "보";
 
-        for (int i = 5; i >= 1; i--) {
+        for (int i = 10; i >= 1; i--) {
             //입력이 완료되었는지 여부를 검사해서 입력이 완료되었으면
             //카운트 다운 쓰레드를 종료시킨다
-            if (UserInput.inputChk == true) {
+            if (UserInput.inputChk) {
 
                 System.out.println("-- 결 과 --");
                 System.out.println("컴퓨터 : " + result);
