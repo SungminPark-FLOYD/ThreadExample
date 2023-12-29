@@ -17,7 +17,6 @@ import java.util.*;
 1번말 --->------------------------------------
 2번말 ----->----------------------------------
 ...
-
 경기가 끝나면 등수 순으로 출력한다.
 * */
 public class racing {
@@ -50,6 +49,14 @@ public class racing {
 
         p.start();
 
+        for (Thread th : hList) {
+            try {
+                th.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             p.join();
         } catch (InterruptedException e) {
@@ -73,7 +80,6 @@ class Horse extends Thread implements Comparable<Horse> {
     private Random random = new Random();
 
     public Horse(String name) {
-        super();
         this.hName = name;
     }
 
@@ -101,7 +107,7 @@ class Horse extends Thread implements Comparable<Horse> {
         this.position = position;
     }
 
-    // this와 h의 랭크를 오름차순으로 정렬
+    // TODO 랭크를 오름차순으로 정렬
     @Override
     public int compareTo(Horse h) {
         return Integer.compare(this.getRank(), h.getRank());
@@ -131,17 +137,12 @@ class Position extends Thread {
     private List<Horse> hs;
 
     public Position(List<Horse> hs) {
-        super();
         this.hs = hs;
     }
 
     @Override
     public void run() {
         while (true) {
-            if (Horse.currentRank == hs.size()) {
-                break;
-            }
-
             for (int i = 1; i <= 10; i++) {
                 System.out.println();
             }
@@ -151,16 +152,20 @@ class Position extends Thread {
                 for (int i = 1; i <= 50; i++) {
                     if (h.getPosition() == i) {
                         System.out.print(">");
-                    } else {
+                    }
+                    else {
                         System.out.print("-");
                     }
                 }
-                if (h.getPosition() == 50) {
-                    System.out.print("골인");
+                if(h.getPosition() == 50) {
+                    System.out.print("도착");
                 }
                 System.out.println();
             }
 
+            if (Horse.currentRank == hs.size()) {
+                break;
+            }
 
             try {
                 Thread.sleep(400);
